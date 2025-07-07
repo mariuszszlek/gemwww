@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: auto; }
+    h1 { text-align: center; margin-top: 1em; }
+    .recommend { background: #f0f8ff; padding: 1em; border-radius: 8px; }
+    .others { margin-top: 1.5em; }
+    .others table { width: 100%; border-collapse: collapse; }
+    .others th, .others td {
+      padding: 0.5em; border: 1px solid #ccc; text-align: left;
+    }
+    .charts { margin-top: 1.5em; }
+    .charts img { width: 100%; border: 1px solid #ddd; border-radius: 4px; }
+    .error { color: red; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>{{ title }}</h1>
+
+  {% if errors %}
+  <div class="error">
+    <strong>Wystąpiły błędy:</strong>
+    <ul>
+      {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="recommend">
+    <h2>Rekomendowane aktywo:</h2>
+    <p><strong>{{ recommendation[1] }} ({{ recommendation[0] }})</strong></p>
+    <p>{{ reason }}</p>
+  </div>
+
+  <div class="others">
+    <h3>Pozostałe aktywa i ich 12-miesięczne zwroty:</h3>
+    <table>
+      <thead>
+        <tr><th>Ticker</th><th>Nazwa</th><th>Zwrot 12m</th></tr>
+      </thead>
+      <tbody>
+        {% for t, name in tickers.items() %}
+        <tr {% if t == recommendation[0] %}style="background:#e0ffe0"{% endif %}>
+          <td>{{ t }}</td>
+          <td>{{ name }}</td>
+          <td>
+            {% if t in momentums %}
+              {{ (momentums[t] * 100) | round(2) }}%
+            {% else %}
+              n/d
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if returns_img %}
+  <div class="charts">
+    <h3>12-miesięczne zwroty procentowe ETF-ów:</h3>
+    <img src="{{ url_for('image', filename=returns_img) }}"
+         alt="Zwroty procentowe ETF-ów">
+  </div>
+  {% endif %}
+</body>
+</html>
